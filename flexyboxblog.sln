@@ -5,11 +5,11 @@ VisualStudioVersion = 17.10.35027.167
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlexyboxBlog", "FlexyboxBlog\FlexyboxBlog.csproj", "{9EF84430-E5FF-43FB-8707-C04E0F496E95}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexyboxBlogRazor", "FlexyboxBlogRazor\FlexyboxBlogRazor\FlexyboxBlogRazor.csproj", "{96A5BB4F-1602-4243-92EB-2395A5F802C0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlexyboxBlogRazor", "FlexyboxBlogRazor\FlexyboxBlogRazor\FlexyboxBlogRazor.csproj", "{96A5BB4F-1602-4243-92EB-2395A5F802C0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexyboxBlogRazor.Client", "FlexyboxBlogRazor\FlexyboxBlogRazor.Client\FlexyboxBlogRazor.Client.csproj", "{B27ACCDA-51C9-44D4-B189-C2DE31187153}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlexyboxBlogRazor.Client", "FlexyboxBlogRazor\FlexyboxBlogRazor.Client\FlexyboxBlogRazor.Client.csproj", "{B27ACCDA-51C9-44D4-B189-C2DE31187153}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FlexyboxShared", "FlexyboxShared\FlexyboxShared.csproj", "{26AD1B78-6113-4341-A993-FFA1721D2F6F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FlexyboxShared", "FlexyboxShared\FlexyboxShared.csproj", "{26AD1B78-6113-4341-A993-FFA1721D2F6F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

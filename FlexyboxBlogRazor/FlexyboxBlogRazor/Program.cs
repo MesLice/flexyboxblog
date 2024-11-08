@@ -1,7 +1,11 @@
 using FlexyboxBlogRazor.Client.Pages;
 using FlexyboxBlogRazor.Components;
+using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Add MudBlazor
+builder.Services.AddMudServices();
 
 // Add services to the container.
 builder.Services.AddRazorComponents()

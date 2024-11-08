@@ -9,7 +9,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\FlexyboxShared\FlexyboxShared.csproj" />
     <ProjectReference Include="..\FlexyboxBlogRazor.Client\FlexyboxBlogRazor.Client.csproj" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.7" />
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.Server" Version="8.0.10" />
   </ItemGroup>
 
 </Project>

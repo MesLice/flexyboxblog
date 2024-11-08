@@ -1,0 +1,22 @@
+﻿@page "/contact"
+@using MudBlazor
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudText Typo="Typo.h4" Align="Align.Center">Contact Us</MudText>
+    <MudTextField T="string" @bind-Value="name" Label="Name" Variant="Variant.Filled" FullWidth="true" />
+    <MudTextField T="string" @bind-Value="email" Label="Email" Variant="Variant.Filled" FullWidth="true" />
+    <MudTextField T="string" @bind-Value="message" Label="Message" Variant="Variant.Filled" FullWidth="true" Rows="4" />
+
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SendMessage">Send Message</MudButton>
+</MudContainer>
+
+@code {
+    private string name;
+    private string email;
+    private string message;
+
+    private void SendMessage()
+    {
+        // Placeholder function to simulate message sending
+    }
+}
