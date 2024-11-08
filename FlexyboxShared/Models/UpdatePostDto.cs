@@ -1,4 +1,4 @@
-﻿namespace FlexyboxBlog.Models
+﻿namespace FlexyboxShared.Models
 {
     public class UpdatePostDto
     {

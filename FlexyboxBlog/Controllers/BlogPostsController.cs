@@ -1,6 +1,7 @@
 ﻿using FlexyboxBlog.Data;
 using FlexyboxBlog.Models;
 using FlexyboxBlog.Models.Entities;
+using FlexyboxShared.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
