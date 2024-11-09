@@ -1,72 +1,23 @@
 ﻿@inherits LayoutComponentBase
 
 @* Required MudBlazor components *@
-<MudThemeProvider @rendermode="InteractiveAuto" @bind-IsDarkMode="@_IsDarkMode" Theme="_theme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
 
 <MudLayout>
-    <!-- Sidebar -->
-    <MudDrawer Class="mud-drawer" Elevation="1" Open="true" Variant="DrawerVariant.Persistent">
-        <MudDrawerHeader>
-            <MudText Typo="Typo.h6">My Blog</MudText>
-        </MudDrawerHeader>
-
-        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-        <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
-        <MudNavLink Href="/contact" Icon="@Icons.Material.Filled.ContactPhone">Contact</MudNavLink>
-        <MudNavLink Href="/categories" Icon="@Icons.Material.Filled.Category">Categories</MudNavLink>
-        <MudNavLink Href="/counter" Icon="@Icons.Material.Filled.Category">Counter</MudNavLink>
-        <MudSwitch @rendermode="InteractiveAuto" @bind-Value="_IsDarkMode" Color="Color.Primary" Class="ma-4" T="bool" Label="Toggle Light/Dark Mode" />
-        <DarkMode />
-    </MudDrawer>
+    <!-- AppBar -->
+    <AppBarCustom />
 
     <!-- Main Content -->
     <MudMainContent>
         <!-- Main blog content (Article list) -->
         <MudContainer MaxWidth="MaxWidth.Large">
-            <article class="content">
-                @Body
-            </article>
+            @Body
         </MudContainer>
     </MudMainContent>
 </MudLayout>
 
 @code {
-    private bool _IsDarkMode
-    {
-        get => _isDarkMode;
-        set
-        {
-            if (_isDarkMode != value)
-            {
-                _isDarkMode = value;
-                Console.WriteLine($"Dark mode changed to: {_isDarkMode}");
-                StateHasChanged(); // Force re-render
-            }
-        }
-    }
 
-    private bool _isDarkMode = true;
-
-    MudTheme _theme = new MudTheme()
-        {
-            PaletteLight = new PaletteLight()
-            {
-                Primary = Colors.Blue.Default,
-                Secondary = Colors.Green.Accent4
-            },
-            PaletteDark = new PaletteDark()
-            {
-                Background = Colors.Gray.Default,
-                Primary = Colors.Blue.Lighten1
-            },
-
-            LayoutProperties = new LayoutProperties()
-            {
-                DrawerWidthLeft = "260px",
-                DrawerWidthRight = "300px"
-            }
-        };
 }

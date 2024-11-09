@@ -1,0 +1,28 @@
+﻿@rendermode InteractiveAuto
+
+<MudDrawer 
+    Height="100vh"
+    Elevation="1" 
+    @bind-Open="@_drawerOpen" 
+    Variant="DrawerVariant.Persistent"
+    Anchor="Anchor.Left">
+
+    <!--
+        The MudDrawer Mini Variant only properly supports MudNavLink elements
+    -->
+
+    <MudToggleIconButton Class="align-self-start" Icon="@Icons.Material.Filled.Menu" @bind-Toggled="_drawerOpen" />
+    <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+    <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+    <MudNavLink Href="/contact" Icon="@Icons.Material.Filled.ContactPhone">Contact</MudNavLink>
+    <MudNavLink Href="/categories" Icon="@Icons.Material.Filled.Category">Categories</MudNavLink>
+    <MudNavLink Href="/counter" Icon="@Icons.Material.Filled.Category">Counter</MudNavLink>
+
+    <MudSpacer />
+
+    <DarkModeSwitch />
+</MudDrawer>
+
+@code {
+    private bool _drawerOpen = true;
+}

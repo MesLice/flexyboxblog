@@ -1,0 +1,21 @@
+﻿@rendermode InteractiveAuto
+
+<MudAppBar Elevation="5" Dense="true" Gutters="false">
+    <MudStack Row="true" Spacing="1" Style="white-space: nowrap;">
+        <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
+        <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Create">Create Post</MudNavLink>
+        <MudNavLink Href="/categories" Icon="@Icons.Material.Filled.Search">Search</MudNavLink>
+    </MudStack>
+
+    <MudSpacer />
+
+    <MudItem>
+        <DarkModeSwitch />
+    </MudItem>
+    <MudItem>
+        <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Person">Account</MudNavLink>
+    </MudItem>
+    <MudItem>
+        <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
+    </MudItem>
+</MudAppBar>

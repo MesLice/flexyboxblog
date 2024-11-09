@@ -1,5 +1,5 @@
-using FlexyboxBlogRazor.Client.Pages;
 using FlexyboxBlogRazor.Components;
+using FlexyboxBlogRazor.Client.Components;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -11,6 +11,15 @@ builder.Services.AddMudServices();
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
+
+// Add API
+builder.Services.AddHttpClient("API", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5023/");
+});
+
+// Add API Services
+builder.Services.AddScoped<BlogPostService>();
 
 var app = builder.Build();
 

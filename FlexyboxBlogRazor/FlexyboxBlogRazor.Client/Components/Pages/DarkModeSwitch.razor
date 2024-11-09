@@ -1,12 +1,18 @@
 ﻿@rendermode InteractiveAuto
 
-<MudThemeProvider @bind-IsDarkMode="@_IsDarkMode" Theme="_theme" />
-<MudSwitch @bind-Value="_IsDarkMode" Color="Color.Primary" Class="ma-4" T="bool" Label="Toggle Light/Dark Mode" />
+<MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_IsDarkMode" Theme="_theme" />
+<MudToggleIconButton
+    Icon="@Icons.Material.Filled.LightMode" 
+    ToggledIcon="@Icons.Material.Filled.DarkMode" 
+    @bind-Toggled="@_IsDarkMode" 
+    Color="Color.Primary" 
+/>
 
 @code {
     private bool _IsDarkMode { get; set; } = true;
+    private MudThemeProvider _mudThemeProvider;
 
-    MudTheme _theme = new MudTheme()
+    private MudTheme _theme = new MudTheme()
         {
             PaletteLight = new PaletteLight()
             {
@@ -15,7 +21,7 @@
             },
             PaletteDark = new PaletteDark()
             {
-                Background = Colors.Gray.Default,
+                Background = Colors.Orange.Default,
                 Primary = Colors.Blue.Lighten1
             },
 

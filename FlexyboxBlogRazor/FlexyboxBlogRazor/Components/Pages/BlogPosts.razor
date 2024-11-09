@@ -1,0 +1,22 @@
+﻿@page "/blogposts"
+@inject BlogPostService BlogPostService
+
+<MudTable Items="posts">
+    <HeaderContent>
+        <MudTh>Title</MudTh>
+        <MudTh>Content</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>@context.Title</MudTd>
+        <MudTd>@context.Content</MudTd>
+    </RowTemplate>
+</MudTable>
+
+@code {
+    private List<BlogPost> posts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        posts = await BlogPostService.GetAllPostsAsync();
+    }
+}
