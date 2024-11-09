@@ -1,7 +1,7 @@
 ﻿@inherits LayoutComponentBase
 
 @* Required MudBlazor components *@
-<MudThemeProvider @bind-IsDarkMode="@_IsDarkMode" Theme="_theme" />
+<MudThemeProvider @rendermode="InteractiveAuto" @bind-IsDarkMode="@_IsDarkMode" Theme="_theme" />
 <MudPopoverProvider />
 <MudDialogProvider />
 <MudSnackbarProvider />
@@ -19,6 +19,7 @@
         <MudNavLink Href="/categories" Icon="@Icons.Material.Filled.Category">Categories</MudNavLink>
         <MudNavLink Href="/counter" Icon="@Icons.Material.Filled.Category">Counter</MudNavLink>
         <MudSwitch @rendermode="InteractiveAuto" @bind-Value="_IsDarkMode" Color="Color.Primary" Class="ma-4" T="bool" Label="Toggle Light/Dark Mode" />
+        <DarkMode />
     </MudDrawer>
 
     <!-- Main Content -->
@@ -42,10 +43,12 @@
             {
                 _isDarkMode = value;
                 Console.WriteLine($"Dark mode changed to: {_isDarkMode}");
+                StateHasChanged(); // Force re-render
             }
         }
     }
-    private bool _isDarkMode;
+
+    private bool _isDarkMode = true;
 
     MudTheme _theme = new MudTheme()
         {
