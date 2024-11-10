@@ -1,0 +1,22 @@
+﻿<MudPaper Elevation="2">
+    <MudStack Spacing="1">
+
+        <!-- Blog Post Title -->
+        <MudText Typo="Typo.h5">@Title</MudText>
+
+        <!-- Author and Date Information -->
+        <MudText Typo="Typo.subtitle2" Color="Color.Secondary">
+            By @Author - @PublishedDate.ToString("MMMM dd, yyyy")
+        </MudText>
+
+        <!-- Blog Content -->
+        <MudText Typo="Typo.body1" Class="mt-2">@Content</MudText>
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Sample Blog Post Title";
+    [Parameter] public string Author { get; set; } = "Author Name";
+    [Parameter] public DateTime PublishedDate { get; set; } = DateTime.Now;
+    [Parameter] public string Content { get; set; } = "This is a sample blog post content.";
+}

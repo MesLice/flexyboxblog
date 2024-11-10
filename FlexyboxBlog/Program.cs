@@ -15,15 +15,18 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add CORS services
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowMudBlazor", builder =>
+    options.AddPolicy("AllowAllOrigins", policy =>
     {
-        builder.WithOrigins("https://localhost:7212")
-               .AllowAnyMethod()
-               .AllowAnyHeader();
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
     });
 });
 
 var app = builder.Build();
+
+// Use CORS
+app.UseCors("AllowAllOrigins");
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -35,9 +38,6 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
-
-// Use CORS
-app.UseCors("AllowMudBlazor");
 
 app.MapControllers();
 

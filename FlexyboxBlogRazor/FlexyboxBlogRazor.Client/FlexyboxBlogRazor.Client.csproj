@@ -13,4 +13,21 @@
     <PackageReference Include="MudBlazor" Version="7.15.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\CreateBlogPost.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Components\Pages\CreateBlogPost.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\SnackBarTest.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\FlexyboxShared\FlexyboxShared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\SnackBarTest.razor" />
+  </ItemGroup>
+
 </Project>

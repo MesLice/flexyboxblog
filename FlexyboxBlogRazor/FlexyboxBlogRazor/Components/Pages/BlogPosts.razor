@@ -1,16 +1,21 @@
 ﻿@page "/blogposts"
 @inject BlogPostService BlogPostService
 
-<MudTable Items="posts">
-    <HeaderContent>
-        <MudTh>Title</MudTh>
-        <MudTh>Content</MudTh>
-    </HeaderContent>
-    <RowTemplate>
-        <MudTd>@context.Title</MudTd>
-        <MudTd>@context.Content</MudTd>
-    </RowTemplate>
-</MudTable>
+<MudStack Spacing="3">
+    @if (posts == null)
+    {
+        <MudText Typo="Typo.h6" Color="Color.Primary">Loading posts...</MudText>
+    }
+    else
+    {
+        @foreach (var post in posts)
+        {
+            <MudItem>
+                <BlogPostComp Title="@post.Title" PublishedDate="@post.CreatedAt" Content="@post.Content" />
+            </MudItem>
+        }
+    }
+</MudStack>
 
 @code {
     private List<BlogPost> posts;

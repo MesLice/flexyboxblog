@@ -1,0 +1,77 @@
+﻿@page "/newblogpost"
+@inject BlogPostService BlogPostService
+@inject ISnackbar Snackbar
+@rendermode InteractiveAuto
+
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Medium">
+    <MudPaper Elevation="2" Padding="Padding.Normal">
+        <MudStack Spacing="3">
+            <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center">Create New Blog Post</MudText>
+
+            <MudForm @ref="form" Model="newPost">
+                <!-- Title Input -->
+                <MudTextField Label="Title" @bind-Value="newPost.Title" Required="true" Variant="Variant.Outlined" />
+
+                <!-- Content Input -->
+                <MudTextField Label="Content" @bind-Value="newPost.Content" Required="true" Variant="Variant.Outlined" Lines="5" />
+
+                <!-- Submit Button -->
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitForm" Disabled="IsSubmitting">
+                    @if (IsSubmitting)
+                    {
+                        <MudProgressCircular Indeterminate Size="Size.Medium" Color="Color.Inherit" />
+                        <span class="ml-2">Submitting...</span>
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Send" />
+                        <span class="ml-2">Submit Post</span>
+                    }
+                </MudButton>
+            </MudForm>
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private AddBlogPostDto newPost = new AddBlogPostDto { Title = string.Empty, Content = string.Empty };
+    private bool IsSubmitting = false;
+
+    // Reference to MudForm for validation
+    private MudForm form;
+
+    private async Task SubmitForm()
+    {
+        // Explicitly validate form before proceeding
+        await form.Validate();
+        if (!form.IsValid)
+        {
+            Snackbar.Add("Please fill in both the title and content.", Severity.Error);
+            return;
+        }
+
+        IsSubmitting = true;
+
+        try
+        {
+            // Send the new post data to the server
+            await BlogPostService.CreatePostAsync(newPost);
+            Snackbar.Add("Blog post created successfully!", Severity.Success);
+
+            // Reset the DTO and form validation after successful submission
+            newPost = new AddBlogPostDto { Title = string.Empty, Content = string.Empty };
+            form.ResetValidation(); // Reset validation without await
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsSubmitting = false;
+        }
+    }
+}

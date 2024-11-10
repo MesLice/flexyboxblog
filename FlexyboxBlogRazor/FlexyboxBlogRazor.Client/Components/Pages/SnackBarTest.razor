@@ -1,0 +1,18 @@
+﻿@page "/snackbar-test"
+@inject ISnackbar Snackbar
+@rendermode InteractiveAuto
+
+<MudPopoverProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowSnackbar">
+    Show Snackbar
+</MudButton>
+
+@code {
+    private void ShowSnackbar()
+    {
+        Snackbar.Add("This is a test snackbar message!", Severity.Success);
+    }
+}
