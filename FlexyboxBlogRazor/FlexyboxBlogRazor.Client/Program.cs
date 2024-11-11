@@ -15,6 +15,3 @@ builder.Services.AddScoped(sp => new HttpClient
 builder.Services.AddScoped<BlogPostService>();
 
 await builder.Build().RunAsync();
-
-
-await builder.Build().RunAsync();

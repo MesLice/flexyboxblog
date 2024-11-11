@@ -21,22 +21,22 @@
     private bool _IsDarkMode { get; set; } = true;
 
     MudTheme _theme = new MudTheme()
+    {
+        PaletteLight = new PaletteLight()
         {
-            PaletteLight = new PaletteLight()
-            {
-                Primary = Colors.Blue.Default,
-                Secondary = Colors.Green.Accent4
-            },
-            PaletteDark = new PaletteDark()
-            {
-                Background = Colors.Gray.Default,
-                Primary = Colors.Blue.Lighten1
-            },
+            Primary = Colors.Blue.Default,
+            Secondary = Colors.Green.Accent4
+        },
+        PaletteDark = new PaletteDark()
+        {
+            Background = Colors.Gray.Default,
+            Primary = Colors.Blue.Lighten1
+        },
 
-            LayoutProperties = new LayoutProperties()
-            {
-                DrawerWidthLeft = "260px",
-                DrawerWidthRight = "300px"
-            }
-        };
+        LayoutProperties = new LayoutProperties()
+        {
+            DrawerWidthLeft = "260px",
+            DrawerWidthRight = "300px"
+        }
+    };
 }

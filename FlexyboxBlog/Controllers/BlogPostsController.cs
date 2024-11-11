@@ -2,6 +2,7 @@
 using FlexyboxBlog.Models;
 using FlexyboxBlog.Models.Entities;
 using FlexyboxShared.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
@@ -36,6 +37,7 @@ namespace FlexyboxBlog.Controllers
             return Ok(result);
         }
 
+        [Authorize]
         [HttpPost]
         public IActionResult CreatePost(AddBlogPostDto addBlogPostDto)
         {
@@ -51,6 +53,7 @@ namespace FlexyboxBlog.Controllers
             return Created();
         }
 
+        [Authorize]
         [HttpPut]
         [Route("{id:guid}")]
         public IActionResult UpdatePost(Guid id, UpdatePostDto updatePostDto)
@@ -67,6 +70,7 @@ namespace FlexyboxBlog.Controllers
             return Ok();
         }
 
+        [Authorize]
         [HttpDelete]
         [Route("{id:guid}")]
         public IActionResult DeletePost(Guid id)

@@ -1,16 +1,24 @@
 ﻿@page "/snackbar-test"
 @inject ISnackbar Snackbar
 @rendermode InteractiveAuto
-
-<MudPopoverProvider />
-<MudDialogProvider />
-<MudSnackbarProvider />
+@inject NavigationManager Navigation
 
 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ShowSnackbar">
     Show Snackbar
 </MudButton>
+<p>Base URI: @BaseUri</p>
+<p>Current URI: @CurrentUri</p>
 
 @code {
+    private string BaseUri;
+    private string CurrentUri;
+
+    protected override void OnInitialized()
+    {
+        BaseUri = Navigation.BaseUri;
+        CurrentUri = Navigation.Uri;
+    }
+
     private void ShowSnackbar()
     {
         Snackbar.Add("This is a test snackbar message!", Severity.Success);
