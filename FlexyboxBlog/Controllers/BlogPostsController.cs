@@ -5,6 +5,8 @@ using FlexyboxShared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace FlexyboxBlog.Controllers
 {
@@ -12,78 +14,91 @@ namespace FlexyboxBlog.Controllers
     [ApiController]
     public class BlogPostsController : ControllerBase
     {
-        private readonly ApplicationDbContext dbContext;
+        private readonly ApplicationDbContext _dbContext;
 
         public BlogPostsController(ApplicationDbContext dbContext)
         {
-            this.dbContext = dbContext;
+            _dbContext = dbContext;
         }
 
+        [AllowAnonymous]
         [HttpGet]
-        public IActionResult GetAllPosts()
+        public async Task<IActionResult> GetAllPosts()
         {
-            return Ok(dbContext.BlogPosts.ToList());
+            var posts = await _dbContext.BlogPosts.ToListAsync();
+            return Ok(posts);
         }
 
-        [HttpGet]
-        [Route("{id:guid}")]
-        public IActionResult GetPostById(Guid id)
+        [AllowAnonymous]
+        [HttpGet("{id:guid}")]
+        public async Task<IActionResult> GetPostById(Guid id)
         {
-            var result = dbContext.BlogPosts.Find(id);
-            if (result is null)
+            var result = await _dbContext.BlogPosts.FindAsync(id);
+            if (result == null)
             {
                 return NotFound();
             }
             return Ok(result);
         }
 
-        [Authorize]
+        [AllowAnonymous]
         [HttpPost]
-        public IActionResult CreatePost(AddBlogPostDto addBlogPostDto)
+        public async Task<IActionResult> CreatePost([FromBody] AddBlogPostDto addBlogPostDto)
         {
-            var blogPost = new BlogPost()
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var blogPost = new BlogPost
             {
                 Title = addBlogPostDto.Title,
                 Content = addBlogPostDto.Content,
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
             };
 
-            dbContext.BlogPosts.Add(blogPost);
-            dbContext.SaveChanges();
-            return Created();
+            _dbContext.BlogPosts.Add(blogPost);
+            await _dbContext.SaveChangesAsync();
+
+            return CreatedAtAction(nameof(GetPostById), new { id = blogPost.Id }, blogPost);
         }
 
         [Authorize]
-        [HttpPut]
-        [Route("{id:guid}")]
-        public IActionResult UpdatePost(Guid id, UpdatePostDto updatePostDto)
+        [HttpPut("{id:guid}")]
+        public async Task<IActionResult> UpdatePost(Guid id, [FromBody] UpdatePostDto updatePostDto)
         {
-            var blogPost = dbContext.BlogPosts.Find(id);
-            if (blogPost is null)
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var blogPost = await _dbContext.BlogPosts.FindAsync(id);
+            if (blogPost == null)
             {
                 return NotFound();
             }
 
             blogPost.Title = updatePostDto.Title;
             blogPost.Content = updatePostDto.Content;
-            dbContext.SaveChanges();
-            return Ok();
+            _dbContext.BlogPosts.Update(blogPost);
+            await _dbContext.SaveChangesAsync();
+
+            return NoContent(); // Returns 204 No Content to indicate success without body
         }
 
         [Authorize]
-        [HttpDelete]
-        [Route("{id:guid}")]
-        public IActionResult DeletePost(Guid id)
+        [HttpDelete("{id:guid}")]
+        public async Task<IActionResult> DeletePost(Guid id)
         {
-            var blogPost = dbContext.BlogPosts.Find(id);
-            if (blogPost is null)
+            var blogPost = await _dbContext.BlogPosts.FindAsync(id);
+            if (blogPost == null)
             {
                 return NotFound();
             }
 
-            dbContext.BlogPosts.Remove(blogPost);
-            dbContext.SaveChanges();
-            return Ok();
+            _dbContext.BlogPosts.Remove(blogPost);
+            await _dbContext.SaveChangesAsync();
+            return NoContent(); // Returns 204 No Content to indicate successful deletion
         }
     }
 }

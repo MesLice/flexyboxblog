@@ -8,9 +8,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add Identity
 builder.Services.AddAuthorization();
 builder.Services.AddIdentityApiEndpoints<IdentityUser>()
-    .AddEntityFrameworkStores<ApplicationDbContext>();
+    .AddEntityFrameworkStores<ApplicationDbContext>()
+    .AddDefaultTokenProviders();
 
-// Add services to the container.
+// Configure Cookie Authentication
+builder.Services.ConfigureApplicationCookie(options =>
+{
+    options.Cookie.HttpOnly = true;
+    options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Cookies only sent over HTTPS
+    options.Cookie.SameSite = SameSiteMode.None; // Required for cross-origin requests
+    options.Cookie.Name = "BlogAuthCookie";
+    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.SlidingExpiration = true;
+});
+
+// Add services to the container
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -22,24 +34,35 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 // Add CORS services
 builder.Services.AddCors(options =>
 {
-    options.AddPolicy("AllowAllOrigins", policy =>
+    options.AddPolicy("AllowBlazorClient", policy =>
     {
-        policy.WithOrigins("https://localhost:7212/")
+        policy.WithOrigins("https://localhost:7212") // Replace with your Blazor client URL, no trailing slash
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials();
+              .AllowCredentials(); // Important to allow cookies for authentication
     });
 });
 
 var app = builder.Build();
 
-// Use CORS
-app.UseCors("AllowAllOrigins");
+// CORS must be applied before Authentication and Authorization
+app.UseCors("AllowBlazorClient");
 
-// Map Identity routes
-app.MapIdentityApi<IdentityUser>();
-app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
-[FromBody] object empty) =>
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+app.UseAuthentication();
+app.UseAuthorization();
+
+// Map Identity API endpoints with CORS
+app.MapIdentityApi<IdentityUser>().RequireCors("AllowBlazorClient");
+
+// Map logout endpoint with CORS
+app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager, [FromBody] object empty) =>
 {
     if (empty != null)
     {
@@ -48,19 +71,10 @@ app.MapPost("/logout", async (SignInManager<IdentityUser> signInManager,
     }
     return Results.Unauthorized();
 })
-.RequireAuthorization();
+.RequireAuthorization()
+.RequireCors("AllowBlazorClient");
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+// Map controller endpoints
+app.MapControllers().RequireCors("AllowBlazorClient");
 
 app.Run();

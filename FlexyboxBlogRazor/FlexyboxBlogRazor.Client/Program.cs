@@ -8,10 +8,10 @@ builder.Services.AddMudServices();
 // Add API
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5023/")
+    BaseAddress = new Uri("https://localhost:7267")
 });
 
-// Add API Services
+// Add API Services for dependency injection
 builder.Services.AddScoped<BlogPostService>();
 
 await builder.Build().RunAsync();

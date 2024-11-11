@@ -13,10 +13,21 @@ builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents()
     .AddInteractiveWebAssemblyComponents();
 
+// Configure Authentication to use Cookies
+builder.Services.AddAuthentication("BlogAuthCookie")
+    .AddCookie("BlogAuthCookie", options =>
+    {
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+    });
+
+builder.Services.AddAuthorization();
+
 // Add API
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5023/")
+    BaseAddress = new Uri("https://localhost:7267")
 });
 
 // Add API Services
@@ -37,9 +48,11 @@ else
 }
 
 app.UseHttpsRedirection();
-
 app.UseStaticFiles();
 app.UseAntiforgery();
+
+app.UseAuthentication(); // Important to enable Authentication Middleware
+app.UseAuthorization();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode()
