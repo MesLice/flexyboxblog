@@ -18,7 +18,7 @@ builder.Services.ConfigureApplicationCookie(options =>
     options.Cookie.SecurePolicy = CookieSecurePolicy.Always; // Cookies only sent over HTTPS
     options.Cookie.SameSite = SameSiteMode.None; // Required for cross-origin requests
     options.Cookie.Name = "BlogAuthCookie";
-    options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+    options.ExpireTimeSpan = TimeSpan.FromDays(30);
     options.SlidingExpiration = true;
 });
 

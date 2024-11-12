@@ -41,7 +41,7 @@ namespace FlexyboxBlog.Controllers
             return Ok(result);
         }
 
-        [AllowAnonymous]
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> CreatePost([FromBody] AddBlogPostDto addBlogPostDto)
         {
