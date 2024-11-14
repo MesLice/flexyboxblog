@@ -1,6 +1,4 @@
-# .NET Developer Job Application - Blogging Platform Documentation
-
-## Project Overview
+# .NET Developer Job Application - Flexybox Blog
 
 ## Start Guide
 
@@ -26,7 +24,7 @@ To run the project locally, follow these steps:
 
 2. **Load the Database Backup**: Load up the database backup from the `mssql-init` folder.
 
-3. **Edit Default Connection String**: Edit the `DefaultConnection` string in `FlexyboxBlogppsettings.json` to point to your local SQL Server instance.
+3. **Edit Default Connection String**: Edit the `DefaultConnection` string in `FlexyboxBlog\appsettings.json` to point to your local SQL Server instance.
 
 4. **Open the Project in Visual Studio**: Open the project in Visual Studio.
 
