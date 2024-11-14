@@ -18,7 +18,7 @@ builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStatePr
 builder.Services.AddTransient<CookieHandler>();
 
 builder.Services.AddHttpClient("WebAPI",
-        client => client.BaseAddress = new Uri("https://localhost:7267/"))
+        client => client.BaseAddress = new Uri("https://localhost:7267"))
     .AddHttpMessageHandler<CookieHandler>();
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()

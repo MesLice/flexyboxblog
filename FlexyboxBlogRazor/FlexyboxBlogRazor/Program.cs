@@ -24,10 +24,13 @@ builder.Services.AddAuthentication("BlogAuthCookie")
 
 builder.Services.AddAuthorization();
 
+// Load ApiBaseUrl from configuration
+string apiBaseUrl = builder.Configuration["ApiBaseUrl"];
+
 // Add API
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("https://localhost:7267")
+    BaseAddress = new Uri(apiBaseUrl)
 });
 
 // Add API Services

@@ -36,7 +36,16 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient", policy =>
     {
-        policy.WithOrigins("https://localhost:7212")
+        policy.WithOrigins(
+                "https://localhost:7212",          // Localhost (for local development)
+                "https://localhost:7267",          // Another development port
+                "https://localhost:443",
+                "https://flexyboxrazor:7212",
+                "https://flexyboxrazor:7267",
+                "https://flexyboxrazor:443",
+                "https://flexyboxblog:7212",
+                "https://flexyboxblog:7267",
+                "https://flexyboxblog:443")       // Docker container name (for Docker deployment)
               .AllowAnyMethod()
               .AllowAnyHeader()
               .AllowCredentials();
@@ -45,7 +54,10 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
-// CORS must be applied before Authentication and Authorization
+// HTTPS redirection should come before CORS
+app.UseHttpsRedirection();
+
+// Apply CORS policy before Authentication/Authorization
 app.UseCors("AllowBlazorClient");
 
 if (app.Environment.IsDevelopment())
@@ -54,7 +66,6 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 

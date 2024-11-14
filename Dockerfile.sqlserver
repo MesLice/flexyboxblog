@@ -1,0 +1,22 @@
+# Use the official SQL Server image as the base
+FROM mcr.microsoft.com/mssql/server:2022-latest
+
+# Switch to root user to install additional tools
+USER root
+
+# Accept the EULA and install SQL Server tools (including sqlcmd) in a non-interactive way
+ENV ACCEPT_EULA=Y
+ENV DEBIAN_FRONTEND=noninteractive
+
+RUN apt-get update && \
+    apt-get install -y mssql-tools unixodbc-dev && \
+    rm -rf /var/lib/apt/lists/*
+
+# Add mssql-tools to the PATH for easy access to sqlcmd
+ENV PATH="$PATH:/opt/mssql-tools/bin"
+
+# Switch back to the mssql user to run SQL Server
+USER mssql
+
+# Expose the SQL Server port
+EXPOSE 1433
