@@ -36,10 +36,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowBlazorClient", policy =>
     {
-        policy.WithOrigins("https://localhost:7212") // Replace with your Blazor client URL, no trailing slash
+        policy.WithOrigins("https://localhost:7212")
               .AllowAnyMethod()
               .AllowAnyHeader()
-              .AllowCredentials(); // Important to allow cookies for authentication
+              .AllowCredentials();
     });
 });
 

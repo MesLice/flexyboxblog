@@ -1,11 +1,12 @@
 ﻿using FlexyboxBlog.Data;
-using FlexyboxBlog.Models;
 using FlexyboxBlog.Models.Entities;
 using FlexyboxShared.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace FlexyboxBlog.Controllers
@@ -25,7 +26,7 @@ namespace FlexyboxBlog.Controllers
         [HttpGet]
         public async Task<IActionResult> GetAllPosts()
         {
-            var posts = await _dbContext.BlogPosts.ToListAsync();
+            var posts = await _dbContext.BlogPosts.Include(p => p.User).ToListAsync();
             return Ok(posts);
         }
 
@@ -33,7 +34,7 @@ namespace FlexyboxBlog.Controllers
         [HttpGet("{id:guid}")]
         public async Task<IActionResult> GetPostById(Guid id)
         {
-            var result = await _dbContext.BlogPosts.FindAsync(id);
+            var result = await _dbContext.BlogPosts.Include(p => p.User).FirstOrDefaultAsync(p => p.Id == id);
             if (result == null)
             {
                 return NotFound();
@@ -50,11 +51,19 @@ namespace FlexyboxBlog.Controllers
                 return BadRequest(ModelState);
             }
 
+            // Get the current user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
             var blogPost = new BlogPost
             {
                 Title = addBlogPostDto.Title,
                 Content = addBlogPostDto.Content,
-                CreatedAt = DateTime.UtcNow
+                CreatedAt = DateTime.UtcNow,
+                UserId = userId // Set the user ID for the blog post
             };
 
             _dbContext.BlogPosts.Add(blogPost);
@@ -78,6 +87,13 @@ namespace FlexyboxBlog.Controllers
                 return NotFound();
             }
 
+            // Ensure the logged-in user is the owner of the blog post
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (blogPost.UserId != userId)
+            {
+                return Forbid();
+            }
+
             blogPost.Title = updatePostDto.Title;
             blogPost.Content = updatePostDto.Content;
             _dbContext.BlogPosts.Update(blogPost);
@@ -96,9 +112,70 @@ namespace FlexyboxBlog.Controllers
                 return NotFound();
             }
 
+            // Ensure the logged-in user is the owner of the blog post
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (blogPost.UserId != userId)
+            {
+                return Forbid();
+            }
+
             _dbContext.BlogPosts.Remove(blogPost);
             await _dbContext.SaveChangesAsync();
             return NoContent(); // Returns 204 No Content to indicate successful deletion
         }
+
+        // Get Current User Endpoint
+        [Authorize]
+        [HttpGet("current-user")]
+        public IActionResult GetCurrentUser()
+        {
+            var user = HttpContext.User;
+
+            if (user.Identity == null || !user.Identity.IsAuthenticated)
+            {
+                return Unauthorized();
+            }
+
+            var username = user.Identity.Name;
+            return Ok(new { Username = username });
+        }
+
+        // Get Posts of Current User Endpoint
+        [Authorize]
+        [HttpGet("my-posts")]
+        public async Task<IActionResult> GetMyPosts()
+        {
+            // Get the current user's ID
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null)
+            {
+                return Unauthorized();
+            }
+
+            // Get posts belonging to the current user
+            var posts = await _dbContext.BlogPosts
+                .Where(p => p.UserId == userId)
+                .ToListAsync();
+
+            return Ok(posts);
+        }
+
+        [HttpGet("search")]
+        public async Task<IActionResult> SearchBlogPosts(string query)
+        {
+            if (string.IsNullOrWhiteSpace(query))
+            {
+                return BadRequest("Search query is required.");
+            }
+
+            var posts = await _dbContext.BlogPosts
+                .Where(post => EF.Functions.Like(post.Title, $"%{query}%") ||
+                               EF.Functions.Like(post.Content, $"%{query}%"))
+                .OrderByDescending(post => post.CreatedAt)
+                .ToListAsync();
+
+            return Ok(posts);
+        }
+
     }
 }

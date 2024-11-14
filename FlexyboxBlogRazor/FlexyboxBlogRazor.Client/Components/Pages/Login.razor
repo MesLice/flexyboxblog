@@ -1,0 +1,130 @@
+﻿@page "/login"
+@rendermode InteractiveWebAssembly
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject HttpClient HttpClient
+
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8 mb-8">
+    <MudPaper Elevation="3" Class="p-8">
+        <MudStack Spacing="4" Class="p-4">
+
+            <!-- Title Section with Padding -->
+            <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-4">
+                Login
+            </MudText>
+
+            <!-- Login Form -->
+            <MudForm @ref="form" Model="loginModel">
+
+                <!-- Email Input -->
+                <MudTextField Label="Email"
+                              @bind-Value="loginModel.Email"
+                              Variant="Variant.Outlined"
+                              FullWidth="true"
+                              Required="true"
+                              Class="mb-4" />
+
+                <!-- Password Input with Visibility Toggle Button -->
+                <MudTextField Label="Password"
+                              @bind-Value="loginModel.Password"
+                              Variant="Variant.Outlined"
+                              InputType="@passwordInputType"
+                              Required="true"
+                              FullWidth="true"
+                              Class="mb-4"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@passwordIcon"
+                              OnAdornmentClick="TogglePasswordVisibility" />
+
+                <!-- Submit Button with Consistent Padding -->
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="HandleLogin"
+                           Disabled="IsProcessing"
+                           Size="Size.Large"
+                           FullWidth="true"
+                           Class="p-3">
+                    @if (IsProcessing)
+                    {
+                        <MudProgressCircular Indeterminate Size="Size.Medium" Color="Color.Inherit" />
+                        <span class="ml-2">Logging In...</span>
+                    }
+                    else
+                    {
+                        <span>Login</span>
+                    }
+                </MudButton>
+            </MudForm>
+
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private LoginModel loginModel = new LoginModel();
+    private bool IsProcessing = false;
+    private MudForm form;
+
+    // Password visibility handling
+    private InputType passwordInputType = InputType.Password;
+    private string passwordIcon = Icons.Material.Filled.VisibilityOff;
+
+    private async Task HandleLogin()
+    {
+        await form.Validate();
+        if (!form.IsValid)
+        {
+            Snackbar.Add("Please fill in both the email and password.", Severity.Error);
+            return;
+        }
+
+        IsProcessing = true;
+
+        try
+        {
+            // Adding the useCookies=true as a query parameter
+            var url = "/login?useCookies=true";
+
+            var response = await HttpClient.PostAsJsonAsync(url, loginModel);
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Successfully logged in!", Severity.Success);
+                NavigationManager.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                Snackbar.Add("Failed to log in. Please check your credentials.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"An error occurred: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsProcessing = false;
+        }
+    }
+
+    private void TogglePasswordVisibility()
+    {
+        if (passwordInputType == InputType.Password)
+        {
+            passwordInputType = InputType.Text;
+            passwordIcon = Icons.Material.Filled.Visibility;
+        }
+        else
+        {
+            passwordInputType = InputType.Password;
+            passwordIcon = Icons.Material.Filled.VisibilityOff;
+        }
+    }
+
+    public class LoginModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}

@@ -51,7 +51,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseAntiforgery();
 
-app.UseAuthentication(); // Important to enable Authentication Middleware
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapRazorComponents<App>()

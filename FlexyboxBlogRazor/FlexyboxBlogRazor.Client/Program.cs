@@ -1,5 +1,6 @@
 using FlexyboxBlogRazor.Client;
 using FlexyboxShared.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.AspNetCore.Components.WebAssembly.Http;
@@ -11,6 +12,7 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.Services.AddMudServices();
 
 builder.Services.AddAuthorizationCore();
+builder.Services.AddScoped<AuthenticationStateProvider, ApiAuthenticationStateProvider>();
 
 // Register the custom CookieHandler for managing cookies
 builder.Services.AddTransient<CookieHandler>();
@@ -21,14 +23,6 @@ builder.Services.AddHttpClient("WebAPI",
 
 builder.Services.AddScoped(sp => sp.GetRequiredService<IHttpClientFactory>()
     .CreateClient("WebAPI"));
-
-/*
-// configure client for auth interactions
-builder.Services.AddHttpClient(
-    "Auth",
-    opt => opt.BaseAddress = new Uri("https://localhost:7267/"))
-.AddHttpMessageHandler<CookieHandler>();
-*/
 
 builder.Services.AddScoped<BlogPostService>();
 

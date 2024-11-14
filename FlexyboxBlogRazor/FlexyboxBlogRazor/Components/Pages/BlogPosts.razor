@@ -1,27 +1,48 @@
 ﻿@page "/blogposts"
 @inject BlogPostService BlogPostService
+@inject NavigationManager NavigationManager
 
-<MudStack Spacing="3">
-    @if (posts == null)
-    {
-        <MudText Typo="Typo.h6" Color="Color.Primary">Loading posts...</MudText>
-    }
-    else
-    {
-        @foreach (var post in posts)
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4">
+    <MudStack Spacing="4" AlignItems="AlignItems.Center">
+        @if (posts == null)
         {
-            <MudItem>
-                <BlogPostComp Title="@post.Title" PublishedDate="@post.CreatedAt" Content="@post.Content" />
-            </MudItem>
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="mt-4" />
         }
-    }
-</MudStack>
+        else if (!posts.Any())
+        {
+            <MudText Typo="Typo.h6" Color="Color.Secondary" Align="Align.Center" Class="mt-4">No posts available yet. Check back later!</MudText>
+        }
+        else
+        {
+            <MudStack Spacing="4" AlignItems="AlignItems.Stretch">
+                @foreach (var post in posts)
+                {
+                    <MudItem xs="12" sm="12" md="12" lg="12">
+                        <BlogPostComp Title="@post.Title"
+                                      PublishedDate="@post.CreatedAt"
+                                      Content="@post.Content" />
+                    </MudItem>
+                }
+            </MudStack>
+        }
+    </MudStack>
+</MudContainer>
 
 @code {
-    private List<BlogPost> posts;
+    private List<BlogPost> posts = new List<BlogPost>();
 
     protected override async Task OnInitializedAsync()
     {
-        posts = await BlogPostService.GetAllPostsAsync();
+        try
+        {
+            posts = await BlogPostService.GetAllPostsAsync();
+
+            // Order posts by CreatedAt descending (most recent first)
+            posts = posts.OrderByDescending(post => post.CreatedAt).ToList();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error fetching blog posts: {ex.Message}");
+        }
     }
 }

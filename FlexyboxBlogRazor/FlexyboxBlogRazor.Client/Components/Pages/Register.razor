@@ -1,0 +1,161 @@
+﻿@page "/register"
+@rendermode InteractiveAuto
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@inject HttpClient HttpClient
+
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-8 mb-8">
+    <MudPaper Elevation="3" Class="p-8">
+        <MudStack Spacing="4" Class="p-4">
+
+            <!-- Title Section with Padding -->
+            <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-4">
+                Register
+            </MudText>
+
+            <!-- Registration Form -->
+            <MudForm @ref="form" Model="registerModel">
+
+                <!-- Email Input -->
+                <MudTextField Label="Email"
+                              @bind-Value="registerModel.Email"
+                              Variant="Variant.Outlined"
+                              Required="true"
+                              FullWidth="true"
+                              Class="mb-4" />
+
+                <!-- Password Input with Visibility Toggle Button -->
+                <MudTextField Label="Password"
+                              @bind-Value="registerModel.Password"
+                              Variant="Variant.Outlined"
+                              InputType="@passwordInputType"
+                              Required="true"
+                              FullWidth="true"
+                              Class="mb-1"
+                              Adornment="Adornment.End"
+                              AdornmentIcon="@passwordIcon"
+                              OnAdornmentClick="TogglePasswordVisibility" />
+
+                <!-- Password Requirement Info -->
+                <MudText Typo="Typo.body2" Color="Color.Secondary" Class="mb-4">
+                    Password must be at least 6 characters long, contain an uppercase letter, a number, and a special character.
+                </MudText>
+
+                <!-- Submit Button with Consistent Padding -->
+                <MudButton Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           OnClick="HandleRegister"
+                           Disabled="IsProcessing"
+                           Size="Size.Large"
+                           FullWidth="true"
+                           Class="p-3">
+                    @if (IsProcessing)
+                    {
+                        <MudProgressCircular Indeterminate Size="Size.Medium" Color="Color.Inherit" />
+                        <span class="ml-2">Registering...</span>
+                    }
+                    else
+                    {
+                        <span>Register</span>
+                    }
+                </MudButton>
+            </MudForm>
+
+        </MudStack>
+    </MudPaper>
+</MudContainer>
+
+@code {
+    private RegisterModel registerModel = new RegisterModel();
+    private bool IsProcessing = false;
+
+    private MudForm form;
+
+    // Password visibility handling
+    private InputType passwordInputType = InputType.Password;
+    private string passwordIcon = Icons.Material.Filled.VisibilityOff;
+
+    private async Task HandleRegister()
+    {
+        await form.Validate();
+        if (!form.IsValid)
+        {
+            Snackbar.Add("Please fill in all the fields correctly.", Severity.Error);
+            return;
+        }
+
+        IsProcessing = true;
+
+        try
+        {
+            // Register user
+            var response = await HttpClient.PostAsJsonAsync("/register", registerModel);
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Successfully registered!", Severity.Success);
+
+                // Auto-login after successful registration with cookies
+                var loginResponse = await HttpClient.PostAsJsonAsync("/login?useCookies=true", new LoginModel
+                    {
+                        Email = registerModel.Email,
+                        Password = registerModel.Password
+                    });
+
+                if (loginResponse.IsSuccessStatusCode)
+                {
+                    Snackbar.Add("Successfully logged in!", Severity.Success);
+                    NavigationManager.NavigateTo("/", forceLoad:true);
+                }
+                else
+                {
+                    Snackbar.Add("Failed to log in after registration. Please log in manually.", Severity.Warning);
+                    NavigationManager.NavigateTo("/login");
+                }
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
+            {
+                Snackbar.Add("Failed to register: Invalid data provided. Please check your details.", Severity.Error);
+            }
+            else
+            {
+                Snackbar.Add("Failed to register. Please try again later.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"An error occurred: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsProcessing = false;
+        }
+    }
+
+    private void TogglePasswordVisibility()
+    {
+        if (passwordInputType == InputType.Password)
+        {
+            passwordInputType = InputType.Text;
+            passwordIcon = Icons.Material.Filled.Visibility;
+        }
+        else
+        {
+            passwordInputType = InputType.Password;
+            passwordIcon = Icons.Material.Filled.VisibilityOff;
+        }
+    }
+
+    public class RegisterModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class LoginModel
+    {
+        public string Email { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+}

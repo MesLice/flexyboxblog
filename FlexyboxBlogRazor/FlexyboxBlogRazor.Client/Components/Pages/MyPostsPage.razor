@@ -1,0 +1,134 @@
+﻿@page "/myposts"
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@rendermode InteractiveWebAssembly
+
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4 mb-8 p-4">
+    <!-- Added padding to container -->
+    <MudStack Spacing="4" AlignItems="AlignItems.Center">
+        <!-- Page Title -->
+        <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-4">
+            My Blog Posts
+        </MudText>
+
+        <!-- Loading Indicator -->
+        @if (IsLoading)
+        {
+            <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="mt-4" />
+        }
+        else if (MyPosts != null && !MyPosts.Any())
+        {
+            <!-- No Posts Message -->
+            <MudText Typo="Typo.h6" Color="Color.Secondary" Align="Align.Center" Class="my-6">
+                You have not created any posts yet.
+            </MudText>
+        }
+        else if (MyPosts != null && MyPosts.Any())
+        {
+            <!-- Posts Display -->
+            <MudStack Spacing="4" Class="w-full">
+                <!-- w-full to ensure full width alignment -->
+                @foreach (var post in MyPosts)
+                {
+                    <MudPaper Elevation="2" Class="p-4 mb-4 w-full">
+                        <!-- Consistent padding and width -->
+                        <MudStack Spacing="2" Class="w-full">
+                            <!-- BlogPostComp for displaying post -->
+                            <BlogPostComp Title="@post.Title"
+                                          PublishedDate="@post.CreatedAt"
+                                          Content="@post.Content" />
+
+                            <!-- Edit/Delete Actions -->
+                            <MudStack Row="true" Spacing="2" Justify="Justify.FlexEnd" AlignItems="AlignItems.Center">
+                                <MudButton Variant="Variant.Outlined" Color="Color.Primary" OnClick="() => EditPost(post.Id)">
+                                    Edit
+                                </MudButton>
+                                <MudButton Variant="Variant.Outlined" Color="Color.Error" OnClick="() => DeletePost(post.Id)">
+                                    Delete
+                                </MudButton>
+                            </MudStack>
+                        </MudStack>
+                    </MudPaper>
+                }
+            </MudStack>
+        }
+    </MudStack>
+</MudContainer>
+
+@code {
+    private List<BlogPost> MyPosts = new();
+    private bool IsLoading = true;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await LoadMyPostsAsync();
+        }
+    }
+
+    private async Task LoadMyPostsAsync()
+    {
+        IsLoading = true;
+        try
+        {
+            var response = await HttpClient.GetAsync("/api/BlogPosts/my-posts");
+            if (response.IsSuccessStatusCode)
+            {
+                var posts = await response.Content.ReadFromJsonAsync<List<BlogPost>>();
+                if (posts != null)
+                {
+                    // Order by most recent first
+                    MyPosts = posts.OrderByDescending(post => post.CreatedAt).ToList();
+                    Snackbar.Add("Posts loaded successfully.", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add("No posts found.", Severity.Warning);
+                }
+            }
+            else
+            {
+                Snackbar.Add("Failed to load posts. Status Code: " + response.StatusCode, Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading posts: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+            StateHasChanged(); // Ensure UI updates after loading is complete
+        }
+    }
+
+    private void EditPost(Guid postId)
+    {
+        NavigationManager.NavigateTo($"/editblogpost/{postId}");
+    }
+
+    private async Task DeletePost(Guid postId)
+    {
+        try
+        {
+            var response = await HttpClient.DeleteAsync($"/api/BlogPosts/{postId}");
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Post deleted successfully.", Severity.Success);
+                await LoadMyPostsAsync();
+            }
+            else
+            {
+                Snackbar.Add("Failed to delete post. Status Code: " + response.StatusCode, Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error deleting post: {ex.Message}", Severity.Error);
+        }
+    }
+}

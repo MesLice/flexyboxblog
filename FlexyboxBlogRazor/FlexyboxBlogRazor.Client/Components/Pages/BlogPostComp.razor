@@ -1,0 +1,26 @@
+﻿<MudPaper Elevation="2" Class="p-4 mb-3">
+    <MudStack Spacing="2" AlignItems="AlignItems.Start">
+
+        <!-- Blog Post Title -->
+        <MudText Typo="Typo.h4" Color="Color.Primary" Class="mb-1">
+            @Title
+        </MudText>
+
+        <!-- Date Information -->
+        <MudText Typo="Typo.subtitle2" Color="Color.Secondary" Class="mb-1">
+            Published on: @PublishedDate.ToString("MMMM dd, yyyy")
+        </MudText>
+
+        <!-- Blog Content -->
+        <MudText Typo="Typo.body1" Class="mt-2">
+            @Content
+        </MudText>
+
+    </MudStack>
+</MudPaper>
+
+@code {
+    [Parameter] public string Title { get; set; } = "Sample Blog Post Title";
+    [Parameter] public DateTime PublishedDate { get; set; } = DateTime.Now;
+    [Parameter] public string Content { get; set; } = "This is a sample blog post content.";
+}

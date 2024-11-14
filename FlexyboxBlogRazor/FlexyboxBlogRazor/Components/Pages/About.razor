@@ -1,8 +1,36 @@
 ﻿@page "/about"
 
-<MudContainer MaxWidth="MaxWidth.Large">
-    <MudText Typo="Typo.h4">About My Blog</MudText>
-    <MudText>
-        Welcome to my blog where I share insights on various topics, including technology, lifestyle, and more.
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-6 mb-8 p-6">
+    <!-- About Section Title -->
+    <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-4">
+        About This Project
+    </MudText>
+
+    <!-- Introduction Section -->
+    <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-6">
+        This website was created as a demonstration project for a job application at Flexybox Danmark ApS. It serves as a showcase of my web development skills, particularly focusing on building and maintaining an interactive platform using modern tools and frameworks.
+    </MudText>
+
+    <!-- Purpose Section -->
+    <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-6">
+        The aim of this project is to illustrate my ability to create a functional and visually appealing web application. All the blog content and features were designed solely for the purpose of demonstrating what I can achieve in a development context, and are not intended for real blogging purposes.
+    </MudText>
+
+    <!-- Links Section -->
+    <MudStack Row="true" Spacing="2" AlignItems="AlignItems.Center" Justify="Justify.Center">
+        <!-- GitHub Repository Button -->
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Href="https://github.com/MesLice/flexyboxblog" Target="_blank" StartIcon="@Icons.Material.Filled.Code" Class="mb-4">
+            View Project on GitHub
+        </MudButton>
+
+        <!-- LinkedIn Profile Button -->
+        <MudButton Variant="Variant.Filled" Color="Color.Secondary" Href="https://www.linkedin.com/in/timon-plichta/" Target="_blank" StartIcon="@Icons.Material.Filled.Person" Class="mb-4">
+            Connect on LinkedIn
+        </MudButton>
+    </MudStack>
+
+    <!-- Contact Information Section -->
+    <MudText Typo="Typo.body1" Align="Align.Center" Class="mt-6">
+        Feel free to connect with me on LinkedIn or explore the project on GitHub to see more details about the implementation. I am always open to discussing potential opportunities or answering questions about the project.
     </MudText>
 </MudContainer>

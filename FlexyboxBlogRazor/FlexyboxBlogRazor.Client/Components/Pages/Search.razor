@@ -1,0 +1,113 @@
+﻿@page "/search"
+@inject HttpClient HttpClient
+@inject ISnackbar Snackbar
+@rendermode InteractiveWebAssembly
+
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Large" Class="mt-4 mb-8 p-4">
+    <!-- Page Title -->
+    <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-4">
+        Search Blog Posts
+    </MudText>
+
+    <!-- Search Input Field -->
+    <MudTextField @bind-Value="searchQuery"
+                  Label="Search for blog posts by title or content..."
+                  Variant="Variant.Outlined"
+                  Adornment="Adornment.Start"
+                  AdornmentIcon="@Icons.Material.Filled.Search"
+                  FullWidth="true"
+                  OnKeyDown="@(e => { if (e.Key == "Enter") ExecuteSearch(); })"
+                  Class="mb-4" />
+
+    <!-- Search Button -->
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="ExecuteSearch" Class="mb-4" FullWidth="true">
+        Search
+    </MudButton>
+
+    <!-- Loading Indicator -->
+    @if (IsLoading)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="mt-4" />
+    }
+    else if (searchResults != null && !searchResults.Any())
+    {
+        <!-- No Results Message -->
+        <MudText Typo="Typo.h6" Color="Color.Secondary" Align="Align.Center" Class="my-6">
+            No blog posts found for your search. Try a different query.
+        </MudText>
+    }
+    else if (searchResults != null && searchResults.Any())
+    {
+        <!-- Posts Display -->
+        <MudStack Spacing="4" AlignItems="AlignItems.Stretch">
+            @foreach (var post in searchResults)
+            {
+                <MudPaper Elevation="2" Class="p-4 mb-4 w-full">
+                    <!-- BlogPostComp to display search results -->
+                    <BlogPostComp Title="@post.Title"
+                                  PublishedDate="@post.CreatedAt"
+                                  Content="@post.Content" />
+                </MudPaper>
+            }
+        </MudStack>
+    }
+</MudContainer>
+
+@code {
+    private string searchQuery = string.Empty;
+    private List<BlogPost> searchResults = new();
+    private bool IsLoading = false;
+
+    private async Task ExecuteSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchQuery))
+        {
+            Snackbar.Add("Please enter a search term.", Severity.Warning);
+            return;
+        }
+
+        IsLoading = true;
+
+        try
+        {
+            // Send GET request to search API with the search query
+            var response = await HttpClient.GetAsync($"/api/BlogPosts/search?query={Uri.EscapeDataString(searchQuery)}");
+            if (response.IsSuccessStatusCode)
+            {
+                var posts = await response.Content.ReadFromJsonAsync<List<BlogPost>>();
+                if (posts != null)
+                {
+                    // Order search results by the most recent one first (CreatedAt descending)
+                    searchResults = posts.OrderByDescending(p => p.CreatedAt).ToList();
+                    Snackbar.Add("Search completed successfully.", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add("No matching posts found.", Severity.Warning);
+                }
+            }
+            else
+            {
+                Snackbar.Add($"Failed to load search results. Status Code: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error searching posts: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    public class BlogPost
+    {
+        public Guid Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public DateTime CreatedAt { get; set; }
+    }
+}

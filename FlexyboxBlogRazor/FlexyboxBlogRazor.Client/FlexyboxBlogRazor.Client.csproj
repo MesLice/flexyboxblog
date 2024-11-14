@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <_ContentIncludedByDefault Remove="Components\Pages\CreateBlogPost.razor" />
+    <_ContentIncludedByDefault Remove="Components\Pages\Login.razor" />
     <_ContentIncludedByDefault Remove="Components\Pages\SnackBarTest.razor" />
   </ItemGroup>
 
@@ -29,6 +30,10 @@
 
   <ItemGroup>
     <UpToDateCheckInput Remove="Components\Pages\SnackBarTest.razor" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <UpToDateCheckInput Remove="Components\Pages\Login.razor" />
   </ItemGroup>
 
 </Project>

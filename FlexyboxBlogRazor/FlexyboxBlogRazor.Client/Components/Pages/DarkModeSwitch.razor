@@ -1,34 +1,61 @@
 ﻿@rendermode InteractiveAuto
 
 <MudThemeProvider @ref="@_mudThemeProvider" @bind-IsDarkMode="@_IsDarkMode" Theme="_theme" />
-<MudToggleIconButton
-    Icon="@Icons.Material.Filled.LightMode" 
-    ToggledIcon="@Icons.Material.Filled.DarkMode" 
-    @bind-Toggled="@_IsDarkMode" 
-    Color="Color.Primary" 
-/>
+<MudToggleIconButton Icon="@Icons.Material.Filled.LightMode"
+                     ToggledIcon="@Icons.Material.Filled.DarkMode"
+                     @bind-Toggled="@_IsDarkMode"
+                     Color="Color.Primary" />
 
 @code {
-    private bool _IsDarkMode { get; set; } = true;
+    private bool _IsDarkMode
+    {
+        get
+        {
+            return DarkModeTrack.IsDarkMode;
+        }
+
+        set
+        {
+            DarkModeTrack.IsDarkMode = value;
+        }
+    }
+
     private MudThemeProvider _mudThemeProvider;
 
     private MudTheme _theme = new MudTheme()
-    {
-        PaletteLight = new PaletteLight()
         {
-            Primary = Colors.Blue.Default,
-            Secondary = Colors.Green.Accent4
-        },
-        PaletteDark = new PaletteDark()
-        {
-            Background = Colors.Orange.Default,
-            Primary = Colors.Blue.Lighten1
-        },
-
-        LayoutProperties = new LayoutProperties()
-        {
-            DrawerWidthLeft = "260px",
-            DrawerWidthRight = "300px"
-        }
-    };
+            PaletteLight = new PaletteLight()
+            {
+                Primary = Colors.Teal.Darken2,
+                Secondary = Colors.Orange.Darken1,
+                Background = Colors.Gray.Lighten4,
+                Surface = Colors.Gray.Lighten3,
+                AppbarBackground = Colors.Teal.Lighten5,
+                AppbarText = Colors.Shades.Black,
+                DrawerBackground = Colors.Gray.Lighten3,
+                TextPrimary = Colors.Gray.Darken3,
+                TextSecondary = Colors.Gray.Darken1,
+                ActionDefault = Colors.Teal.Darken1,
+                Divider = Colors.Gray.Lighten1,
+            },
+            PaletteDark = new PaletteDark()
+            {
+                Primary = Colors.Teal.Lighten3,
+                Secondary = Colors.Orange.Accent2,
+                Background = Colors.Gray.Darken4,
+                Surface = Colors.Gray.Darken3,
+                AppbarBackground = Colors.Gray.Darken3,
+                AppbarText = Colors.Shades.White,
+                DrawerBackground = Colors.Gray.Darken3,
+                TextPrimary = Colors.Shades.White,
+                TextSecondary = Colors.Gray.Lighten2,
+                ActionDefault = Colors.Teal.Lighten2,
+                Divider = Colors.Gray.Darken1,
+            },
+            LayoutProperties = new LayoutProperties()
+            {
+                DrawerWidthLeft = "260px",
+                DrawerWidthRight = "260px"
+            },
+        };
 }

@@ -1,0 +1,130 @@
+﻿@page "/editblogpost/{postId:guid}"
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+@rendermode InteractiveWebAssembly
+
+<MudSnackbarProvider />
+
+<MudContainer MaxWidth="MaxWidth.Medium" Class="mt-4 mb-8 p-4">
+    <!-- Page Title -->
+    <MudText Typo="Typo.h4" Color="Color.Primary" Align="Align.Center" Class="mb-4">
+        Edit Blog Post
+    </MudText>
+
+    @if (IsLoading)
+    {
+        <MudProgressCircular Indeterminate="true" Color="Color.Primary" Size="Size.Large" Class="mt-4" />
+    }
+    else
+    {
+        <MudForm @ref="form" Model="editPost" ValidateOnSubmit="true">
+            <MudTextField Label="Title" @bind-Value="editPost.Title" Required="true" Variant="Variant.Outlined" FullWidth="true" Class="mb-4" />
+
+            <MudTextField Label="Content" @bind-Value="editPost.Content" Required="true" Variant="Variant.Outlined" FullWidth="true" Lines="10" Class="mb-4" />
+
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="SubmitEdit" Disabled="IsSubmitting" FullWidth="true" Size="Size.Large">
+                @if (IsSubmitting)
+                {
+                    <MudProgressCircular Indeterminate Size="Size.Medium" Color="Color.Inherit" />
+                    <span class="ml-2">Updating...</span>
+                }
+                else
+                {
+                    <span>Update Post</span>
+                }
+            </MudButton>
+        </MudForm>
+    }
+</MudContainer>
+
+@code {
+    [Parameter] public Guid postId { get; set; }
+    private EditBlogPostModel editPost = new EditBlogPostModel();
+    private bool IsLoading = true;
+    private bool IsSubmitting = false;
+
+    // Declare the MudForm reference
+    private MudForm form;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPostAsync();
+    }
+
+    private async Task LoadPostAsync()
+    {
+        try
+        {
+            var response = await HttpClient.GetAsync($"/api/BlogPosts/{postId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var post = await response.Content.ReadFromJsonAsync<EditBlogPostModel>();
+                if (post != null)
+                {
+                    editPost = post;
+                    Snackbar.Add("Post loaded successfully.", Severity.Success);
+                }
+                else
+                {
+                    Snackbar.Add("Post not found.", Severity.Warning);
+                    NavigationManager.NavigateTo("/myposts");
+                }
+            }
+            else
+            {
+                Snackbar.Add("Failed to load post. Status Code: " + response.StatusCode, Severity.Error);
+                NavigationManager.NavigateTo("/myposts");
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading post: {ex.Message}", Severity.Error);
+            NavigationManager.NavigateTo("/myposts");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    private async Task SubmitEdit()
+    {
+        await form.Validate(); // Validate the form before submission
+        if (!form.IsValid)
+        {
+            Snackbar.Add("Please fill in all required fields.", Severity.Warning);
+            return;
+        }
+
+        IsSubmitting = true;
+
+        try
+        {
+            var response = await HttpClient.PutAsJsonAsync($"/api/BlogPosts/{postId}", editPost);
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Post updated successfully!", Severity.Success);
+                NavigationManager.NavigateTo("/myposts");
+            }
+            else
+            {
+                Snackbar.Add("Failed to update post. Status Code: " + response.StatusCode, Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error updating post: {ex.Message}", Severity.Error);
+        }
+        finally
+        {
+            IsSubmitting = false;
+        }
+    }
+
+    public class EditBlogPostModel
+    {
+        public string Title { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+    }
+}

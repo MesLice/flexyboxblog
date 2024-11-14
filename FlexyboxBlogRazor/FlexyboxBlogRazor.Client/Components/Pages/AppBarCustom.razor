@@ -1,21 +1,144 @@
-﻿@rendermode InteractiveAuto
+﻿@rendermode InteractiveWebAssembly
+@inject HttpClient HttpClient
+@inject NavigationManager NavigationManager
+@inject ISnackbar Snackbar
+
+<MudPopoverProvider />
 
 <MudAppBar Elevation="5" Dense="true" Gutters="false">
+    <!-- Navigation Links -->
     <MudStack Row="true" Spacing="1" Style="white-space: nowrap;">
         <MudNavLink Href="/" Match="NavLinkMatch.All" Icon="@Icons.Material.Filled.Home">Home</MudNavLink>
-        <MudNavLink Href="/newblogpost" Icon="@Icons.Material.Filled.Create">Create Post</MudNavLink>
-        <MudNavLink Href="/categories" Icon="@Icons.Material.Filled.Search">Search</MudNavLink>
+
+        @if (IsLoggedIn)
+        {
+            <MudNavLink Href="/newblogpost" Icon="@Icons.Material.Filled.Create">Create Post</MudNavLink>
+        }
+
+        <MudNavLink Href="/search" Icon="@Icons.Material.Filled.Search">Search</MudNavLink>
+
+        @if (IsLoggedIn)
+        {
+            <MudNavLink Href="/myposts" Icon="@Icons.Material.Filled.Article">My Posts</MudNavLink>
+        }
     </MudStack>
 
     <MudSpacer />
 
+    <!-- Dark Mode Switch -->
     <MudItem>
         <DarkModeSwitch />
     </MudItem>
+
+    <!-- Account Section -->
     <MudItem>
-        <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Person">Account</MudNavLink>
+        @if (!IsLoggedIn)
+        {
+            <MudMenu Icon="@Icons.Material.Filled.AccountCircle" Label="Account" Dense="true">
+                <MudMenuItem OnClick="NavigateToLogin">Login</MudMenuItem>
+                <MudMenuItem OnClick="NavigateToRegister">Register</MudMenuItem>
+            </MudMenu>
+        }
+        else
+        {
+            <MudMenu Icon="@Icons.Material.Filled.Person" Label="Account" Dense="true">
+                <MudMenuItem OnClick="Logout">Logout</MudMenuItem>
+            </MudMenu>
+        }
     </MudItem>
+
+    <!-- Username Display -->
+    <MudItem>
+        @if (IsLoggedIn)
+        {
+            <MudText Typo="Typo.body1" Color="Color.Primary" Align="Align.Center">@Username</MudText>
+        }
+    </MudItem>
+
+    <!-- About Link -->
     <MudItem>
         <MudNavLink Href="/about" Icon="@Icons.Material.Filled.Info">About</MudNavLink>
     </MudItem>
 </MudAppBar>
+
+@code {
+    private bool IsLoggedIn = false;
+    private string Username = "Guest";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await CheckAuthenticationStateAsync();
+    }
+
+    public async Task CheckAuthenticationStateAsync()
+    {
+        try
+        {
+            var response = await HttpClient.GetAsync("/api/BlogPosts/current-user");
+            if (response.IsSuccessStatusCode)
+            {
+                var userInfo = await response.Content.ReadFromJsonAsync<UserInfo>();
+                if (userInfo != null && !string.IsNullOrEmpty(userInfo.Username))
+                {
+                    IsLoggedIn = true;
+                    Username = userInfo.Username;
+                }
+                else
+                {
+                    IsLoggedIn = false;
+                    Username = "Guest";
+                }
+            }
+            else
+            {
+                IsLoggedIn = false;
+                Username = "Guest";
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error fetching user info: {ex.Message}", Severity.Error);
+            IsLoggedIn = false;
+            Username = "Guest";
+        }
+    }
+
+    private void NavigateToLogin()
+    {
+        NavigationManager.NavigateTo("/login");
+    }
+
+    private void NavigateToRegister()
+    {
+        NavigationManager.NavigateTo("/register");
+    }
+
+    private async void Logout()
+    {
+        try
+        {
+            // Sending a POST request to log out the user with an empty JSON object
+            var response = await HttpClient.PostAsJsonAsync("/logout", new { });
+            if (response.IsSuccessStatusCode)
+            {
+                Snackbar.Add("Logged out successfully", Severity.Success);
+                IsLoggedIn = false;
+                Username = "Guest";
+                NavigationManager.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                Snackbar.Add("Failed to log out.", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error during logout: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private class UserInfo
+    {
+        public string Username { get; set; } = string.Empty;
+    }
+}
