@@ -41,7 +41,7 @@
 </MudContainer>
 
 @code {
-    private AddBlogPostDto newPost = new AddBlogPostDto { Title = string.Empty, Content = string.Empty };
+    private BlogPostDto newPost = new BlogPostDto { Title = string.Empty, Content = string.Empty };
     private bool IsSubmitting = false;
 
     private MudForm form;
@@ -62,7 +62,7 @@
             await BlogPostService.CreatePostAsync(newPost);
             Snackbar.Add("Blog post created successfully!", Severity.Success);
 
-            newPost = new AddBlogPostDto { Title = string.Empty, Content = string.Empty };
+            newPost = new BlogPostDto { Title = string.Empty, Content = string.Empty };
             form.ResetValidation();
         }
         catch (Exception ex)

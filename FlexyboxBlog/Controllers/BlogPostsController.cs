@@ -1,6 +1,6 @@
 ﻿using FlexyboxBlog.Data;
 using FlexyboxBlog.Models.Entities;
-using FlexyboxShared.Models;
+using FlexyboxShared.Models.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -44,7 +44,7 @@ namespace FlexyboxBlog.Controllers
 
         [Authorize]
         [HttpPost]
-        public async Task<IActionResult> CreatePost([FromBody] AddBlogPostDto addBlogPostDto)
+        public async Task<IActionResult> CreatePost([FromBody] BlogPostDto blogPostDto)
         {
             if (!ModelState.IsValid)
             {
@@ -60,10 +60,11 @@ namespace FlexyboxBlog.Controllers
 
             var blogPost = new BlogPost
             {
-                Title = addBlogPostDto.Title,
-                Content = addBlogPostDto.Content,
+                Id = Guid.NewGuid(),
+                Title = blogPostDto.Title,
+                Content = blogPostDto.Content,
                 CreatedAt = DateTime.UtcNow,
-                UserId = userId // Set the user ID for the blog post
+                UserId = userId
             };
 
             _dbContext.BlogPosts.Add(blogPost);
@@ -74,29 +75,29 @@ namespace FlexyboxBlog.Controllers
 
         [Authorize]
         [HttpPut("{id:guid}")]
-        public async Task<IActionResult> UpdatePost(Guid id, [FromBody] UpdatePostDto updatePostDto)
+        public async Task<IActionResult> UpdatePost(Guid id, [FromBody] BlogPostDto blogPostDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            var blogPost = await _dbContext.BlogPosts.FindAsync(id);
-            if (blogPost == null)
+            var existingBlogPost = await _dbContext.BlogPosts.FindAsync(id);
+            if (existingBlogPost == null)
             {
                 return NotFound();
             }
 
             // Ensure the logged-in user is the owner of the blog post
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (blogPost.UserId != userId)
+            if (existingBlogPost.UserId != userId)
             {
                 return Forbid();
             }
 
-            blogPost.Title = updatePostDto.Title;
-            blogPost.Content = updatePostDto.Content;
-            _dbContext.BlogPosts.Update(blogPost);
+            existingBlogPost.Title = blogPostDto.Title;
+            existingBlogPost.Content = blogPostDto.Content;
+            _dbContext.BlogPosts.Update(existingBlogPost);
             await _dbContext.SaveChangesAsync();
 
             return NoContent(); // Returns 204 No Content to indicate success without body

@@ -59,7 +59,7 @@
 </MudContainer>
 
 @code {
-    private List<BlogPost> MyPosts = new();
+    private List<BlogPostDto> MyPosts = new();
     private bool IsLoading = true;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
@@ -78,7 +78,7 @@
             var response = await HttpClient.GetAsync("/api/BlogPosts/my-posts");
             if (response.IsSuccessStatusCode)
             {
-                var posts = await response.Content.ReadFromJsonAsync<List<BlogPost>>();
+                var posts = await response.Content.ReadFromJsonAsync<List<BlogPostDto>>();
                 if (posts != null)
                 {
                     // Order by most recent first

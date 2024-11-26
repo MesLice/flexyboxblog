@@ -1,5 +1,4 @@
-﻿using FlexyboxShared.Models;
-using FlexyboxShared.Models.Entities;
+﻿using FlexyboxShared.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -20,12 +19,11 @@ namespace FlexyboxShared.Services
             _logger = logger;
         }
 
-        // Fetch all blog posts
-        public async Task<List<BlogPost>> GetAllPostsAsync()
+        public async Task<List<BlogPostDto>> GetAllPostsAsync()
         {
             try
             {
-                return await _httpClient.GetFromJsonAsync<List<BlogPost>>("api/BlogPosts");
+                return await _httpClient.GetFromJsonAsync<List<BlogPostDto>>("api/BlogPosts");
             }
             catch (HttpRequestException ex)
             {
@@ -34,12 +32,11 @@ namespace FlexyboxShared.Services
             }
         }
 
-        // Fetch a blog post by its ID
-        public async Task<BlogPost> GetPostByIdAsync(Guid id)
+        public async Task<BlogPostDto> GetPostByIdAsync(Guid id)
         {
             try
             {
-                return await _httpClient.GetFromJsonAsync<BlogPost>($"api/BlogPosts/{id}");
+                return await _httpClient.GetFromJsonAsync<BlogPostDto>($"api/BlogPosts/{id}");
             }
             catch (HttpRequestException ex)
             {
@@ -48,8 +45,7 @@ namespace FlexyboxShared.Services
             }
         }
 
-        // Create a new blog post
-        public async Task CreatePostAsync(AddBlogPostDto newPost)
+        public async Task CreatePostAsync(BlogPostDto newPost)
         {
             try
             {
@@ -63,8 +59,7 @@ namespace FlexyboxShared.Services
             }
         }
 
-        // Update an existing blog post
-        public async Task UpdatePostAsync(Guid id, UpdatePostDto updatedPost)
+        public async Task UpdatePostAsync(Guid id, BlogPostDto updatedPost)
         {
             try
             {
@@ -78,7 +73,6 @@ namespace FlexyboxShared.Services
             }
         }
 
-        // Delete a blog post
         public async Task DeletePostAsync(Guid id)
         {
             try
@@ -93,7 +87,6 @@ namespace FlexyboxShared.Services
             }
         }
 
-        // Helper method to log errors with inner exception details if available
         private void LogError(string message, Exception ex)
         {
             _logger.LogError(ex, "{Message}: {ErrorMessage}", message, ex.Message);
